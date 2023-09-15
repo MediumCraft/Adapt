@@ -1,12 +1,12 @@
-name: Build and Release [Beta]
+name: Build Adapt
 
+# For each push on all branches
 on:
-  workflow_dispatch:
   push:
-    paths:
-    - 'src/**'
-    - 'pom.xml'
-    - '.github/workflows/automation-release.yml'
+    branches:
+      - '*'
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,47 +16,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-  
-    - name: Cache Dependencies
-      id: cache-dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven
-    
-    - name: Set up Java Environment
-      uses: actions/setup-java@v3
-      with:
-        java-version: 19
-        distribution: 'temurin'
-        cache: 'maven'
+      - name: Checkout latest code
+        uses: actions/checkout@v2
 
-    - name: Build and Test
-      run: mvn clean package install
-    
-    - name: Set outputs
-      id: short_sha
-      run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-    
-    - name: Deploy to GitHub Releases
-      uses: actions/upload-artifact@v2
-      with:
-        name: Adapt-${{ steps.short_sha.outputs.sha_short }}
-        path: target/*.jar
-    
-    - name: Publish Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: target/*.jar
-        body: |
-          Commit ${{ steps.short_sha.outputs.sha_short }}
-          This release is automatically compiled by GitHub Actions
-        name: Adapt Automation Compile ${{ steps.short_sha.outputs.sha_short }}
-        draft: false
-        tag_name: commit-${{ steps.short_sha.outputs.sha_short }}
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE_KEY }}
-        GITHUB_REPOSITORY: MediumCraft/Adapt
+      - name: Set outputs
+        id: vars
+        #run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup build cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      
+      - name: Gradle Permission
+        run: chmod +x ./gradlew
+      
+      - name: Build with Gradle
+        run: ./gradlew build --full-stacktrace
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Adapt-${{ steps.vars.outputs.sha_short }}
+          path: build/libs
+      
+      - name: Release Files
+        uses: softprops/action-gh-release@v1
+        with: 
+          token: ${{ secrets.RELEASE_KEY }}
+          files: |
+            build/libs/*.jar
+          tag_name: commit-${{ steps.vars.outputs.sha_short }}
+          name: Adapt ${{ steps.vars.outputs.sha_short }}
+          body: |
+            Commit ${{ steps.vars.outputs.sha_short }}
+            Negativity
+          generate_release_notes: true
+        env:
+          GITHUB_REPOSITORY: MediumCraft/Adapt
