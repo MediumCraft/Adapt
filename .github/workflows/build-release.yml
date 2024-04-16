@@ -42,8 +42,12 @@ jobs:
         run: chmod +x ./gradlew
       
       - name: Build with Gradle
-        run: ./gradlew build --full-stacktrace
-        continue-on-error: true
+        run: ./gradlew setup --full-stacktrace
+        #continue-on-error: true
+
+      - name: Build with Gradle
+        run: ./gradlew adapt --full-stacktrace
+        #continue-on-error: true
       
       - name: Upload artifact
         uses: actions/upload-artifact@v2
