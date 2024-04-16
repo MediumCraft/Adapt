@@ -23,14 +23,14 @@ plugins {
     id "de.undercouch.download" version "5.0.1"
 }
 
-version '1.14.0-1.20.4'
+version '1.14.2-1.20.4'
 def nmsVersion = "1.20.4" //[NMS]
 def apiVersion = '1.20'
-def specialSourceVersion = '1.11.0' //[NMS]
+def specialSourceVersion = '1.11.4' //[NMS]
 def spigotJarVersion = '1.20.4-R0.1-SNAPSHOT' //[NMS]
 def name = getRootProject().getName() // Defined in settings.gradle
 def main = 'com.volmit.adapt.Adapt'
-def manifoldVersion = '2023.1.29'
+def manifoldVersion = '2024.1.10'
 
 // ADD YOURSELF AS A NEW LINE IF YOU WANT YOUR OWN BUILD TASK GENERATED
 // ======================== WINDOWS =============================
@@ -39,6 +39,7 @@ registerCustomOutputTask('Psycho', 'C://Dan/MinecraftDevelopment/Server/plugins'
 registerCustomOutputTask('ArcaneArts', 'C://Users/arcane/Documents/development/server/plugins')
 registerCustomOutputTask('Vatuu', 'D://Minecraft/Servers/1.20/plugins')
 registerCustomOutputTask('Nowhere', 'E://Desktop/server/plugins')
+registerCustomOutputTask('CrazyDev22', 'C://Users/Julian/Desktop/server/plugins')
 // ========================== UNIX ==============================
 registerCustomOutputTaskUnix('CyberpwnLT', '/Users/danielmills/development/server/plugins')
 registerCustomOutputTaskUnix('PsychoLT', '/Users/brianfopiano/Desktop/REMOTES/RemoteMinecraft/plugins')
@@ -107,11 +108,13 @@ shadowJar {
     relocate 'art.arcane', 'com.volmit.adapt.util.arcane'
     relocate 'Fukkit.extensions', 'com.volmit.adapt.util.extensions'
     relocate 'Amulet.extensions', 'com.volmit.adapt.util.extensions'
+    relocate 'eu.endercentral.crazy_advancements', 'com.volmit.adapt.util.advancements'
     dependencies {
         include(dependency('systems.manifold:'))
         include(dependency('xyz.xenondevs:'))
         include(dependency('art.arcane:'))
         include(dependency('io.github.mqzn:'))
+        include(dependency('com.github.VolmitSoftware:AdvancementsAPI:'))
     }
 }
 
@@ -147,6 +150,8 @@ dependencies {
     implementation "com.github.angeschossen:ChestProtectAPI:3.9.1"
     implementation "com.github.TechFortress:GriefPrevention:16.18.1"
     implementation 'xyz.xenondevs:particle:1.8.1'
+    //implementation 'com.github.ZockerAxel:CrazyAdvancementsAPI:v2.1.17a'
+    implementation 'com.github.VolmitSoftware:AdvancementsAPI:2.1.17:shadable'
     compileOnly 'com.griefdefender:api:2.1.0-SNAPSHOT'
 
     // Dynamically Loaded
